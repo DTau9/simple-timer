@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Timer</title>
+</head>
+<style>
+	#setdate {
+		background-color: #d4d3dc;
+		border: 2px solid #b6b6ca;
+		color: darkred;
+		cursor: pointer;
+		font-size: 23px;
+		padding: 6px;
+	}
+
+	.timer {
+		color: darkred;
+		text-align: center;
+	}
+
+	span[id] {
+		font-size: 100px
+	}
+
+	span[id]+span {
+		font-size: 30px;
+	}
+</style>
+
+<body>
+	<input type="date" id="setdate">
+	<div class="timer">
+		<span id="years">0</span> <span>год </span>
+		<span id="days">0</span> <span>дней </span>
+		<span id="hours">0</span> <span>часов </span>
+		<span id="minutes">0</span> <span>минут </span>
+		<span id="seconds">0</span> <span>секунд</span>
+	</div>
+	<script>
+		'use strict';
+
+		window.addEventListener('DOMContentLoaded', () => {
+
+			let timerId;
+
+			function timeLeft(deadline) {
+				const total = Date.parse(deadline) - Date.parse(new Date()),
+					years = Math.floor(total / (1000 * 60 * 60 * 24 * 365)),
+					days = Math.floor(total / (1000 * 60 * 60 * 24) % 365),
+					hours = Math.floor(total / (1000 * 60 * 60) % 24),
+					minutes = Math.floor(total / 1000 / 60 % 60),
+					seconds = Math.floor(total / 1000 % 60);
+
+				return {
+					total,
+					years,
+					days,
+					hours,
+					minutes,
+					seconds
+				};
+			}
+
+			function getZero(num) {
+				if (num >= 0 && num < 10) {
+					return `0${num}`;
+				} else {
+					return num;
+				}
+			}
+
+			function setTimer(selector, deadLine) {
+				const timer = document.querySelector(selector),
+					years = timer.querySelector('#years'),
+					days = timer.querySelector('#days'),
+					hours = timer.querySelector('#hours'),
+					minutes = timer.querySelector('#minutes'),
+					seconds = timer.querySelector('#seconds');
+				clearInterval(timerId);
+				timerId = setInterval(timerUpdate, 1000);
+
+				timerUpdate();
+
+				function timerUpdate() {
+					let t = timeLeft(deadLine);
+
+					years.innerHTML = getZero(t.years);
+					days.innerHTML = getZero(t.days);
+					hours.innerHTML = getZero(t.hours);
+					minutes.innerHTML = getZero(t.minutes);
+					seconds.innerHTML = getZero(t.seconds);
+
+					if (t.total <= 0) {
+						clearInterval(timerId);
+						years.innerHTML = 0;
+						days.innerHTML = 0;
+						hours.innerHTML = 0;
+						minutes.innerHTML = 0;
+						seconds.innerHTML = 0;
+						alert('Таймер не может быть установлен в прошедшее время');
+					}
+				}
+			}
+
+			function getChangesTimer(inputDate) {
+				const date = document.querySelector(inputDate);
+
+				date.addEventListener('change', () => {
+					setTimer('.timer', date.value);
+				});
+			}
+
+			getChangesTimer('#setdate');
+
+		});
+	</script>
+</body>
+
+</html>
